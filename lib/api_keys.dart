@@ -1,3 +1,3 @@
 library api_keys;
 
-const String apiKey = '--Get-Gemini-API-Key--';
+const String apiKey = 'AIzaSyAJJ-IAXYXpaaWBJU4wNmoCsKLCA0Udc7Y';

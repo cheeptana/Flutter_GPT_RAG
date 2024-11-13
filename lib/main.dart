@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'chatAssistantScreen.dart';
+import 'General_Modle_Screen.dart';
 
 
 
@@ -14,7 +14,7 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: ChatScreen(),
+      home: GeneralModleScreen(),
       themeMode: ThemeMode.dark,
       darkTheme: ThemeData.dark(),
     );

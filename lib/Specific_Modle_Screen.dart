@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_register_app/General_Modle_Screen.dart';
 import 'package:flutter_register_app/api_keys.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
@@ -9,17 +10,28 @@ import 'package:image_picker/image_picker.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 
-class ChatScreen extends StatefulWidget {
+class SpecificModelScreen extends StatefulWidget {
   @override
-  State<ChatScreen> createState() => _ChatScreenState();
+  State<SpecificModelScreen> createState() => _SpecificModelScreenState();
 }
 
-class _ChatScreenState extends State<ChatScreen> {
+class _SpecificModelScreenState extends State<SpecificModelScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Assistant"),
+        title: Text("Specific modle"),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.arrow_forward),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => GeneralModleScreen()),
+              );
+            },
+          ),
+        ],
       ),
       body: const ChatWidget(apiKey: apiKey),
     );
@@ -48,6 +60,30 @@ class _ChatWidgetState extends State<ChatWidget> {
   final SpeechToText _speechToText = SpeechToText();
   final List<({Image? image, String? text, bool fromUser})> _generatedContent =
       <({Image? image, String? text, bool fromUser})>[];
+  static const prompt = '''
+งานของคุณคือการสนทนากับลูกค้าที่ต้องการความช่วยเหลือเกี่ยวกับมหาวิทยาลัยราชมงคลตะวันออกวิทยาเขตจักรพงษภูวนารถ 
+หากลูกค้าถามคำถามที่ไม่เกี่ยวข้องกับมหาวิทยาลัย คุณต้องตอบกลับไปว่าคุณมีความรู้เฉพาะในเรื่องมหาวิทยาลัยราชมงคลตะวันออกวิทยาเขตจักรพงษภูวนารถเท่านั้น
+คุณจะเป็นแชทบอท AI ชื่อ "ครูสมศรี" และคุณจะเรียกตัวเองด้วยชื่อนี้ คุณต้องตอบคำถามอย่างสมบูรณ์แบบ
+หากมีคำถามใดที่คุณไม่สามารถตอบได้หรือไม่แน่ใจ คุณสามารถแนะนำให้ติดต่อศูนย์บริการทางโทรศัพท์ 02277-2985 หรือเพจเฟซบุ๊ก วิทยาเขตจักรพงษภูวนารถเพื่อขอรายละเอียดเพิ่มเติม
+นี่คือ JSON format 
+JSON:
+[  
+  {
+   "คำถาม": "มหาวิทยาลัยมีสาขาอะไรบ้าง"
+   "คำตอบ": "มหาวิทยาลัยมีสาขา การบัญชี การตลาด การจัดการ เศรษศาสตร์ เทคโนโลยีสารสนเทศ"
+  },
+  {
+    "คำถาม": "เปิดเทอม ปีการศึกษา 2567 เมื่อไหร่"
+    "คำตอบ": "วันที่ 3 กค 2567"
+   },
+   {
+    "คำถาม": "เปิดรับสมัครชั้นอะไรบ้าง"
+    "คำตอบ": "ปริญญาตรี โท และ เอก"
+   }
+]
+หากผู้ใช้ถามคำถามที่ไม่เกี่ยวข้องกับมหาวิทยาลัยราชมงคลตะวันออกวิทยาเขตจักรพงษภูวนารถ 
+คุณต้องตอบว่า คุณรู้เพียงแค่เรื่องของมหาวิทยาลัยราชมงคลตะวันออกวิทยาเขตจักรพงษภูวนารถเท่านั้น
+''';
   bool _loading = false;
 
   @override
@@ -56,6 +92,7 @@ class _ChatWidgetState extends State<ChatWidget> {
     _model = GenerativeModel(
       model: 'gemini-1.5-flash-latest',
       apiKey: widget.apiKey,
+      systemInstruction: Content.system(prompt)
     );
     _chat = _model.startChat();
   }
@@ -142,12 +179,11 @@ class _ChatWidgetState extends State<ChatWidget> {
                 ),
                 const SizedBox.square(dimension: 15),
                 if (!_loading)
-                  IconButton(
+                 IconButton(
                     onPressed: () async {
+                      _stopSpeakText();
                       final recognizedText = await _listenForSpeech();
-                      if (recognizedText != null) {
-                        _sendChatMessage(recognizedText);
-                      }
+                      _sendChatMessage(recognizedText!);
                     },
                     icon: Icon(Icons.keyboard_voice),
                     color: Theme.of(context).colorScheme.primary,
@@ -187,31 +223,33 @@ class _ChatWidgetState extends State<ChatWidget> {
   }
 
   Future<String?> _listenForSpeech() async {
-    final SpeechToText _speechToText = SpeechToText();
-    final Completer<String?> _completer = Completer();
+  final SpeechToText _speechToText = SpeechToText();
 
-    final bool available = await _speechToText.initialize();
-    if (available) {
-      _speechToText.listen(
-        localeId: 'th-TH',
-        onResult: (val) async {
-          if (val.recognizedWords.isNotEmpty) {
-            final recognizedText = val.recognizedWords;
-            print('Recognized text: $recognizedText');
-            _completer.complete(recognizedText);
-          } else {
-            print('No recognized text.'); // Add a debug log
-            _completer.complete(null);
-          }
-        },
-      );
-    } else {
-      print('Speech recognition not available.');
-      _completer.complete(null);
-    }
-
-    return _completer.future;
+  final bool available = await _speechToText.initialize();
+  if (!available) {
+    print('Speech recognition not available.');
+    return null;
   }
+
+  String? recognizedText;
+
+  _speechToText.listen(
+    localeId: 'th-TH',
+    onResult: (val) {
+      if (val.recognizedWords.isNotEmpty) {
+        recognizedText = val.recognizedWords;
+        print('Recognized text: $recognizedText');
+      } else {
+        print('No recognized text.');
+      }
+      _stopListenForSpeech();
+    },
+  );
+
+  await Future.delayed(Duration(seconds: 5)); 
+  _stopListenForSpeech(); 
+  return recognizedText;
+}
 
   Future<void> _stopListenForSpeech() async {
     final SpeechToText _speechToText = SpeechToText();
@@ -309,8 +347,12 @@ class _ChatWidgetState extends State<ChatWidget> {
   Future<void> _speakText(String texts) async {
     final tts = FlutterTts();
     await tts.setLanguage('th-TH');
-    await tts.setSpeechRate(0.7);
+    await tts.setSpeechRate(1);
     await tts.speak(texts);
+  }
+
+  Future<void> _stopSpeakText() async {
+    await _tts.stop();
   }
 
   void _showError(String message) {
