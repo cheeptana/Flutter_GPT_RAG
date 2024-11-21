@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'General_Modle_Screen.dart';
+import 'Screen/General_Modle_Screen.dart';
 
 
 
@@ -15,8 +15,6 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: GeneralModleScreen(),
-      themeMode: ThemeMode.dark,
-      darkTheme: ThemeData.dark(),
     );
   }
 }
