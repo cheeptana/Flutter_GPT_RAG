@@ -1,128 +1,72 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-class Homescreen extends StatefulWidget {
-  const Homescreen({super.key});
+class CRUDScreen extends StatefulWidget {
+  const CRUDScreen({super.key});
 
   @override
-  State<Homescreen> createState() => _HomescreenState();
+  State<CRUDScreen> createState() => _CRUDScreenState();
 }
 
-class _HomescreenState extends State<Homescreen> {
-  // รายละเอียดการแจ้งเตือน
-  final List<Map<String, String>> notifications = [
-    {
-      "title": "Registration Deadline Approaching",
-      "department": "Department of Registration",
-      "details": "The deadline for registration is next week. Please ensure you complete your registration."
-    },
-    {
-      "title": "New Course Available",
-      "department": "Student Development Department",
-      "details": "A new course on Mobile App Development is now available for enrollment."
-    },
-    {
-      "title": "Programming 1 Assignment Due",
-      "department": "Programming 1 Class",
-      "details": "Don't forget to submit your assignment by the end of the week."
-    },
-  ];
+class _CRUDScreenState extends State<CRUDScreen> {
+  final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
 
-  void _showNotificationDetails(String title, String details) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(title),
-          content: Text(details),
-          actions: [
-            TextButton(
-              child: const Text("Close"),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
+  void _addData() {
+    FirebaseFirestore.instance.collection('academic_years').add({
+      'title': _titleController.text,
+      'description': _descriptionController.text,
+      'year': DateTime.now().year,
+    });
+    _titleController.clear();
+    _descriptionController.clear();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("HomeScreen"),
-      ),
-      body: ListView(
+      appBar: AppBar(title: const Text('CRUD Firebase')),
+      body: Padding(
         padding: const EdgeInsets.all(16.0),
-        children: [
-          // Card for student ID
-          Card(
-            elevation: 4,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
+        child: Column(
+          children: [
+            TextField(
+              controller: _titleController,
+              decoration: const InputDecoration(labelText: 'หัวข้อ'),
             ),
-            child: const Padding(
-              padding: EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      // Profile Picture
-                      CircleAvatar(
-                        radius: 30,
-                        backgroundImage: NetworkImage('https://example.com/profile.jpg'),
-                      ),
-                      SizedBox(width: 10),
-                      // Student Information
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "John Doe",
-                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                          ),
-                          Text("Student ID: 123456"),
-                          Text("Email: johndoe@example.com"),
-                        ],
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 10),
-                  Divider(),
-                  SizedBox(height: 10),
-                  Text(
-                    "Department: Computer Science",
-                    style: TextStyle(fontSize: 16),
-                  ),
-                  Text(
-                    "Enrollment Year: 2022",
-                    style: TextStyle(fontSize: 16),
-                  ),
-                ],
+            TextField(
+              controller: _descriptionController,
+              decoration: const InputDecoration(labelText: 'รายละเอียด'),
+            ),
+            ElevatedButton(
+              onPressed: _addData,
+              child: const Text('เพิ่มข้อมูล'),
+            ),
+            // แสดงข้อมูลที่มีอยู่
+            Expanded(
+              child: StreamBuilder<QuerySnapshot>(
+                stream: FirebaseFirestore.instance.collection('academic_years').snapshots(),
+                builder: (context, snapshot) {
+                  if (!snapshot.hasData) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  final data = snapshot.data!.docs;
+                  return ListView.builder(
+                    itemCount: data.length,
+                    itemBuilder: (context, index) {
+                      return ListTile(
+                        title: Text(data[index]['title']),
+                        subtitle: Text(data[index]['description']),
+                        // เพิ่มปุ่มสำหรับแก้ไขและลบข้อมูล
+                      );
+                    },
+                  );
+                },
               ),
             ),
-          ),
-          const SizedBox(height: 20),
-          // Notifications Section
-          const Text(
-            "Notifications",
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 10),
-          // List of notifications
-          ...notifications.map((notification) {
-            return ListTile(
-              title: Text(notification["title"]!),
-              subtitle: Text(notification["department"]!),
-              onTap: () {
-                _showNotificationDetails(notification["title"]!, notification["details"]!);
-              },
-            );
-          }),
-        ],
+          ],
+        ),
       ),
     );
   }

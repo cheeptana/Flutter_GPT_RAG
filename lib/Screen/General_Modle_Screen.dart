@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_register_app/Screen/Specific_Modle_Screen.dart';
 import 'package:flutter_register_app/ConnectAPI/api_keys.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:image_picker/image_picker.dart';
@@ -10,6 +9,7 @@ import 'package:flutter_tts/flutter_tts.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 
 import '../Widget_UI/MassageWidget.dart';
+import 'Specific_Modle_Screen.dart';
 
 class GeneralModleScreen extends StatefulWidget {
   const GeneralModleScreen({super.key});
@@ -23,18 +23,42 @@ class _GeneralModleScreenState extends State<GeneralModleScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("general modle"),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.arrow_forward),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => SpecificModelScreen()),
-              );
-            },
-          ),
-        ],
+        title: const Text("General Modle"),
+      ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            const DrawerHeader(
+              decoration: BoxDecoration(
+                color: Colors.blue,
+              ),
+              child: Text(
+                'Menu',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                ),
+              ),
+            ),
+            ListTile(
+              title: const Text('General Modle'),
+              onTap: () {
+                Navigator.pop(context); // ปิด Drawer
+              },
+            ),
+            ListTile(
+              title: const Text('Specific Modle'),
+              onTap: () {
+                Navigator.pop(context); // ปิด Drawer
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => SpecificModelScreen()),
+                );
+              },
+            ),
+          ],
+        ),
       ),
       body: const ChatWidget(apiKey: apiKey),
     );

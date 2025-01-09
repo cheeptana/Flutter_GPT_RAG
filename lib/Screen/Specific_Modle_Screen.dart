@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_register_app/Screen/General_Modle_Screen.dart';
@@ -23,18 +25,42 @@ class _SpecificModelScreenState extends State<SpecificModelScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Specific modle"),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.arrow_forward),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => GeneralModleScreen()),
-              );
-            },
-          ),
-        ],
+        title: const Text("EducChat"),
+      ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            const DrawerHeader(
+              decoration: BoxDecoration(
+                color: Colors.blue,
+              ),
+              child: Text(
+                'Menu',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                ),
+              ),
+            ),
+            ListTile(
+              title: const Text('General Modle'),
+              onTap: () {
+                Navigator.pop(context); // ปิด Drawer
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => GeneralModleScreen()),
+                );
+              },
+            ),
+            ListTile(
+              title: const Text('Specific Modle'),
+              onTap: () {
+                Navigator.pop(context); // ปิด Drawer
+              },
+            ),
+          ],
+        ),
       ),
       body: const ChatWidget(apiKey: apiKey),
     );
@@ -61,52 +87,58 @@ class _ChatWidgetState extends State<ChatWidget> {
   final FocusNode _textFieldFocus = FocusNode();
   final FlutterTts _tts = FlutterTts();
   final SpeechToText _speechToText = SpeechToText();
+  final ImagePicker _picker = ImagePicker();
   final List<({Image? image, String? text, bool fromUser})> _generatedContent =
       <({Image? image, String? text, bool fromUser})>[];
-  static const prompt = '''
-งานของคุณคือการสนทนากับลูกค้าที่ต้องการความช่วยเหลือเกี่ยวกับมหาวิทยาลัยราชมงคลตะวันออกวิทยาเขตจักรพงษภูวนารถ 
-หากลูกค้าถามคำถามที่ไม่เกี่ยวข้องกับมหาวิทยาลัย คุณต้องตอบกลับไปว่าคุณมีความรู้เฉพาะในเรื่องมหาวิทยาลัยราชมงคลตะวันออกวิทยาเขตจักรพงษภูวนารถเท่านั้น
-คุณจะเป็นแชทบอท AI ชื่อ "ครูสมศรี" และคุณจะเรียกตัวเองด้วยชื่อนี้ คุณต้องตอบคำถามอย่างสมบูรณ์แบบ
-หากมีคำถามใดที่คุณไม่สามารถตอบได้หรือไม่แน่ใจ คุณสามารถแนะนำให้ติดต่อศูนย์บริการทางโทรศัพท์ 02277-2985 หรือเพจเฟซบุ๊ก วิทยาเขตจักรพงษภูวนารถเพื่อขอรายละเอียดเพิ่มเติม
-นี่คือ JSON format 
-JSON:
-[  
-  {
-   "คำถาม": "มหาวิทยาลัยมีสาขาอะไรบ้าง"
-   "คำตอบ": "มหาวิทยาลัยมีสาขา การบัญชี การตลาด การจัดการ เศรษศาสตร์ เทคโนโลยีสารสนเทศ"
-  },
-  {
-    "คำถาม": "เปิดเทอม ปีการศึกษา 2567 เมื่อไหร่"
-    "คำตอบ": "วันที่ 3 กค 2567"
-   },
-   {
-    "คำถาม": "เปิดรับสมัครชั้นอะไรบ้าง"
-    "คำตอบ": "ปริญญาตรี โท และ เอก"
-   }
-]
-หากผู้ใช้ถามคำถามที่ไม่เกี่ยวข้องกับมหาวิทยาลัยราชมงคลตะวันออกวิทยาเขตจักรพงษภูวนารถ 
-คุณต้องตอบว่า คุณรู้เพียงแค่เรื่องของมหาวิทยาลัยราชมงคลตะวันออกวิทยาเขตจักรพงษภูวนารถเท่านั้น
-''';
+
+  String json = '';
+  String newprompt = '';
   bool _loading = false;
 
   @override
   void initState() {
     super.initState();
+    _initializeChatModel();
+  }
+
+  Future<void> _initializeChatModel() async {
+    const prompt = '''
+คุณทำหน้าที่เป็นเจ้าหน้าที่มหาวิทยาลัยราชมงคลตะวันออก วิทยาเขตจักรพงษภูวนารถ 
+มีหน้าที่สนทนาและให้ข้อมูลแก่นักศึกษา คุณจะตอบคำถามอย่างชัดเจนและตรงไปตรงมาในเรื่องที่เกี่ยวข้องกับวิทยาเขตจักรพงษภูวนารถเท่านั้น
+หากนักศึกษาถามคำถามที่ไม่เกี่ยวข้องกับวิทยาเขตนี้ คุณจะชี้แจงว่าไม่สามารถให้ข้อมูลได้ เพราะคุณมีความเชี่ยวชาญเฉพาะในหัวข้อที่เกี่ยวกับวิทยาเขตจักรพงษภูวนารถโดยตรงเท่านั้น 
+ในกรณีที่พบคำถามซึ่งคุณไม่แน่ใจ หรือไม่สามารถตอบได้ คุณจะแนะนำให้นักศึกษาติดต่อศูนย์บริการทางโทรศัพท์ที่หมายเลข 02-277-2985 หรือเพจเฟซบุ๊ก 'วิทยาเขตจักรพงษภูวนารถ' เพื่อขอข้อมูลเพิ่มเติม
+นี่คือ JSON format 
+''';
+    if (json == '') {
+      json = await getFaqData();
+      newprompt = prompt + json;
+      print(newprompt);
+    }
     _model = GenerativeModel(
-      model: 'gemini-1.5-flash-latest',
-      apiKey: widget.apiKey,
-      systemInstruction: Content.system(prompt)
-    );
+        model: 'gemini-1.5-flash-latest',
+        apiKey: widget.apiKey,
+        systemInstruction: Content.system(newprompt));
     _chat = _model.startChat();
+  }
+
+  Future<String> getFaqData() async {
+    FirebaseFirestore firestore = FirebaseFirestore.instance;
+    CollectionReference faqCollection = firestore.collection('FAQ');
+
+    QuerySnapshot querySnapshot = await faqCollection.get();
+    List<Map<String, dynamic>> faqList = [];
+    for (var doc in querySnapshot.docs) {
+      faqList.add(doc.data() as Map<String, dynamic>);
+    }
+
+    return jsonEncode(faqList);
   }
 
   void _scrollDown() {
     WidgetsBinding.instance.addPostFrameCallback(
       (_) => _scrollController.animateTo(
         _scrollController.position.maxScrollExtent,
-        duration: const Duration(
-          milliseconds: 750,
-        ),
+        duration: const Duration(milliseconds: 750),
         curve: Curves.easeOutCirc,
       ),
     );
@@ -142,19 +174,48 @@ JSON:
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Expanded(
-            child: apiKey.isNotEmpty
-                ? ListView.builder(
-                    controller: _scrollController,
-                    itemBuilder: (context, idx) {
-                      final content = _generatedContent[idx];
-                      return MessageWidget(
-                        text: content.text,
-                        image: content.image,
-                        isFromUser: content.fromUser,
-                      );
-                    },
-                    itemCount: _generatedContent.length,
-                  )
+            child: widget.apiKey.isNotEmpty
+                ? _generatedContent.isEmpty
+                    ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Image.asset(
+                              'assets/Images/EducChatLogo.png',
+                              width: 150,
+                              height: 150,
+                            ),
+                            const SizedBox(height: 20),
+                            const Text(
+                              'ยินดีต้อนรับสู่ EducChat',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            const Text(
+                              'คุณสามารถถามคำถามเกี่ยวกับมหาวิทยาลัยราชมงคลตะวันออกวิทยาเขตจักรพงษภูวนารถได้ที่นี่',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 16,
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    : ListView.builder(
+                        controller: _scrollController,
+                        itemBuilder: (context, idx) {
+                          final content = _generatedContent[idx];
+                          return MessageWidget(
+                            text: content.text,
+                            image: content.image,
+                            isFromUser: content.fromUser,
+                          );
+                        },
+                        itemCount: _generatedContent.length,
+                      )
                 : ListView(
                     children: const [
                       Text(
@@ -182,32 +243,30 @@ JSON:
                 ),
                 const SizedBox.square(dimension: 15),
                 if (!_loading)
-                 IconButton(
+                  IconButton(
                     onPressed: () async {
                       _stopSpeakText();
                       final recognizedText = await _listenForSpeech();
-                      _sendChatMessage(recognizedText!);
+                      if (recognizedText != null) {
+                        _sendChatMessage(recognizedText);
+                      }
                     },
                     icon: const Icon(Icons.keyboard_voice),
                     color: Theme.of(context).colorScheme.primary,
                   ),
                 if (!_loading)
                   IconButton(
-                    onPressed: !_loading
-                        ? () async {
-                            _sendImagePrompt(_textController.text);
-                          }
-                        : null,
+                    onPressed: () async {
+                      _sendImagePrompt(_textController.text);
+                    },
                     icon: Icon(
                       Icons.image,
-                      color: _loading
-                          ? Theme.of(context).colorScheme.secondary
-                          : Theme.of(context).colorScheme.primary,
+                      color: Theme.of(context).colorScheme.primary,
                     ),
                   ),
                 if (!_loading)
                   IconButton(
-                    onPressed: () async {
+                    onPressed: () {
                       _sendChatMessage(_textController.text);
                     },
                     icon: Icon(
@@ -226,37 +285,34 @@ JSON:
   }
 
   Future<String?> _listenForSpeech() async {
-  final SpeechToText speechToText = SpeechToText();
+    final bool available = await _speechToText.initialize();
+    if (!available) {
+      print('Speech recognition not available.');
+      return null;
+    }
 
-  final bool available = await speechToText.initialize();
-  if (!available) {
-    print('Speech recognition not available.');
-    return null;
+    String? recognizedText;
+
+    _speechToText.listen(
+      localeId: 'th-TH',
+      onResult: (val) {
+        if (val.recognizedWords.isNotEmpty) {
+          recognizedText = val.recognizedWords;
+          print('Recognized text: $recognizedText');
+        } else {
+          print('No recognized text.');
+        }
+        _stopListenForSpeech();
+      },
+    );
+
+    await Future.delayed(const Duration(seconds: 5));
+    _stopListenForSpeech();
+    return recognizedText;
   }
 
-  String? recognizedText;
-
-  speechToText.listen(
-    localeId: 'th-TH',
-    onResult: (val) {
-      if (val.recognizedWords.isNotEmpty) {
-        recognizedText = val.recognizedWords;
-        print('Recognized text: $recognizedText');
-      } else {
-        print('No recognized text.');
-      }
-      _stopListenForSpeech();
-    },
-  );
-
-  await Future.delayed(const Duration(seconds: 5)); 
-  _stopListenForSpeech(); 
-  return recognizedText;
-}
-
   Future<void> _stopListenForSpeech() async {
-    final SpeechToText speechToText = SpeechToText();
-    await speechToText.stop();
+    await _speechToText.stop();
   }
 
   Future<void> _sendImagePrompt(String message) async {
@@ -264,8 +320,7 @@ JSON:
       _loading = true;
     });
     try {
-      final ImagePicker picker = ImagePicker();
-      final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+      final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
       if (image != null) {
         final bytes = await image.readAsBytes();
         final content = [
@@ -303,9 +358,6 @@ JSON:
       });
     } finally {
       _textController.clear();
-      setState(() {
-        _loading = false;
-      });
       _textFieldFocus.requestFocus();
     }
   }
@@ -328,25 +380,21 @@ JSON:
         _loading = false;
         _scrollDown();
       });
-        } catch (e) {
+    } catch (e) {
       _showError(e.toString());
       setState(() {
         _loading = false;
       });
     } finally {
       _textController.clear();
-      setState(() {
-        _loading = false;
-      });
       _textFieldFocus.requestFocus();
     }
   }
 
   Future<void> _speakText(String texts) async {
-    final tts = FlutterTts();
-    await tts.setLanguage('th-TH');
-    await tts.setSpeechRate(1);
-    await tts.speak(texts);
+    await _tts.setLanguage('th-TH');
+    await _tts.setSpeechRate(1);
+    await _tts.speak(texts);
   }
 
   Future<void> _stopSpeakText() async {
@@ -375,4 +423,3 @@ JSON:
     );
   }
 }
-
