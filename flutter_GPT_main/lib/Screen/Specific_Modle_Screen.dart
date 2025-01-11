@@ -46,7 +46,7 @@ class _SpecificModelScreenState extends State<SpecificModelScreen> {
             ListTile(
               title: const Text('General Modle'),
               onTap: () {
-                Navigator.pop(context); // ปิด Drawer
+                Navigator.pop(context);
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => GeneralModleScreen()),
@@ -56,7 +56,7 @@ class _SpecificModelScreenState extends State<SpecificModelScreen> {
             ListTile(
               title: const Text('Specific Modle'),
               onTap: () {
-                Navigator.pop(context); // ปิด Drawer
+                Navigator.pop(context);
               },
             ),
           ],
