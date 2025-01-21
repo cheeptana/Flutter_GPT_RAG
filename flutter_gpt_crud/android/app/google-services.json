@@ -7,9 +7,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:587032935514:android:dac0ae60132495415eec63",
+        "mobilesdk_app_id": "1:587032935514:android:e34924f23179f6415eec63",
         "android_client_info": {
-          "package_name": "com.example.educchat_dataedit"
+          "package_name": "com.example.flutter_gpt_crud"
         }
       },
       "oauth_client": [],
@@ -26,7 +26,7 @@
     },
     {
       "client_info": {
-        "mobilesdk_app_id": "1:587032935514:android:7a594454638dee9b5eec63",
+        "mobilesdk_app_id": "1:587032935514:android:7d5d546eaf04fedc5eec63",
         "android_client_info": {
           "package_name": "com.example.flutter_register_app"
         }

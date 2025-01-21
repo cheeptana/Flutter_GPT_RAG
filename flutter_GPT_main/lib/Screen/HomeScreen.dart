@@ -62,7 +62,7 @@ class _SpecificModelScreen2State extends State<SpecificModelScreen2> {
           ],
         ),
       ),
-      body: const ChatWidget(apiKey: apiKey),
+      body: const ChatWidget(apiKey: GeminiConfig.apiKey),
     );
   }
 }

@@ -4,6 +4,8 @@ import 'package:firebase_core/firebase_core.dart';
 
 import 'package:flutter_gpt_crud/loginscreen.dart';
 
+import 'ConfigAPI/apiKey.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   if (defaultTargetPlatform == TargetPlatform.android) {
@@ -11,13 +13,12 @@ void main() async {
   } else {
     await Firebase.initializeApp(
       options: FirebaseOptions(
-          apiKey: "AIzaSyDWiuykpMlzdPDnyzRq_pg3QZvte8Qq4yk",
-          authDomain: "flutter-registerdata.firebaseapp.com",
-          projectId: "flutter-registerdata",
-          storageBucket: "flutter-registerdata.firebasestorage.app",
-          messagingSenderId: "587032935514",
-          appId: "1:587032935514:web:ffaf21c0b8a1b1815eec63"
-          ),
+          apiKey: Config.apiKey,
+          authDomain: Config.authDomain,
+          projectId: Config.projectId,
+          storageBucket: Config.storageBucket,
+          messagingSenderId: Config.messagingSenderId,
+          appId: Config.appId),
     );
   }
   runApp(MyApp());

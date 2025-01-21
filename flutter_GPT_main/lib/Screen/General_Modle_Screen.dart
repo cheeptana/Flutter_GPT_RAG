@@ -60,7 +60,7 @@ class _GeneralModleScreenState extends State<GeneralModleScreen> {
           ],
         ),
       ),
-      body: const ChatWidget(apiKey: apiKey),
+      body: const ChatWidget(apiKey: GeminiConfig.apiKey),
     );
   }
 }
@@ -142,7 +142,7 @@ class _ChatWidgetState extends State<ChatWidget> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Expanded(
-            child: apiKey.isNotEmpty
+            child: GeminiConfig.apiKey.isNotEmpty
                 ? ListView.builder(
                     controller: _scrollController,
                     itemBuilder: (context, idx) {
