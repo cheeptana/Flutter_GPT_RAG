@@ -49,7 +49,7 @@ class _SpecificModelScreen2State extends State<SpecificModelScreen2> {
                 Navigator.pop(context);
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => GeneralModleScreen()),
+                  MaterialPageRoute(builder: (context) => const GeneralModleScreen()),
                 );
               },
             ),

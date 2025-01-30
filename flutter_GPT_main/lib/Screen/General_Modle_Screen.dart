@@ -53,7 +53,7 @@ class _GeneralModleScreenState extends State<GeneralModleScreen> {
                 Navigator.pop(context); // ปิด Drawer
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => SpecificModelScreen()),
+                  MaterialPageRoute(builder: (context) => const SpecificModelScreen()),
                 );
               },
             ),
@@ -84,7 +84,6 @@ class _ChatWidgetState extends State<ChatWidget> {
   final TextEditingController _textController = TextEditingController();
   final FocusNode _textFieldFocus = FocusNode();
   final FlutterTts _tts = FlutterTts();
-  final SpeechToText _speechToText = SpeechToText();
   final List<({Image? image, String? text, bool fromUser})> _generatedContent =
       <({Image? image, String? text, bool fromUser})>[];
   bool _loading = false;

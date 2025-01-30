@@ -20,7 +20,7 @@ class _LoginscreenState extends State<Loginscreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('เข้าสู่ระบบ'),
+        title: const Text('เข้าสู่ระบบ'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
@@ -30,7 +30,7 @@ class _LoginscreenState extends State<Loginscreen> {
             children: [
               TextFormField(
                 controller: _emailController,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'อีเมล',
                   border: OutlineInputBorder(),
                 ),
@@ -41,11 +41,11 @@ class _LoginscreenState extends State<Loginscreen> {
                   return null;
                 },
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               TextFormField(
                 controller: _passwordController,
                 obscureText: true,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'รหัสผ่าน',
                   border: OutlineInputBorder(),
                 ),
@@ -56,7 +56,7 @@ class _LoginscreenState extends State<Loginscreen> {
                   return null;
                 },
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () async {
                   if (_formKey.currentState!.validate()) {
@@ -67,24 +67,24 @@ class _LoginscreenState extends State<Loginscreen> {
                       );
                       Navigator.pushReplacement(
                         context,
-                        MaterialPageRoute(builder: (context) => MainScreen()),
+                        MaterialPageRoute(builder: (context) => const MainScreen()),
                       );
                     } catch (e) {
                       print(e);
                     }
                   }
                 },
-                child: Text('เข้าสู่ระบบ'),
+                child: const Text('เข้าสู่ระบบ'),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               TextButton(
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => Signupscreen()),
+                    MaterialPageRoute(builder: (context) => const Signupscreen()),
                   );
                 },
-                child: Text('สมัครสมาชิก'),
+                child: const Text('สมัครสมาชิก'),
               ),
             ],
           ),

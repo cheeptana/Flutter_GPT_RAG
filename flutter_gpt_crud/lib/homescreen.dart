@@ -15,9 +15,9 @@ class _HomescreenState extends State<Homescreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('หน้าหลัก'),
+        title: const Text('หน้าหลัก'),
       ),
-      body: Center(
+      body: const Center(
         child: Text('เข้าสู่ระบบสำเร็จ'),
       ),
     );
@@ -25,6 +25,8 @@ class _HomescreenState extends State<Homescreen> {
 }
 
 class CRUDscreen extends StatefulWidget {
+  const CRUDscreen({super.key});
+
   @override
   _CRUDscreenState createState() => _CRUDscreenState();
 }
@@ -41,23 +43,23 @@ class _CRUDscreenState extends State<CRUDscreen> {
       showDialog(
         context: context,
         builder: (context) {
-          final _questionController = TextEditingController();
-          final _answerController = TextEditingController();
+          final questionController = TextEditingController();
+          final answerController = TextEditingController();
 
           return AlertDialog(
-            title: Text('เพิ่มคำถาม'),
+            title: const Text('เพิ่มคำถาม'),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 TextField(
-                  controller: _questionController,
-                  decoration: InputDecoration(
+                  controller: questionController,
+                  decoration: const InputDecoration(
                     labelText: 'คำถาม',
                   ),
                 ),
                 TextField(
-                  controller: _answerController,
-                  decoration: InputDecoration(
+                  controller: answerController,
+                  decoration: const InputDecoration(
                     labelText: 'คำตอบ',
                   ),
                 ),
@@ -65,17 +67,17 @@ class _CRUDscreenState extends State<CRUDscreen> {
             ),
             actions: [
               TextButton(
-                child: Text('ยกเลิก'),
+                child: const Text('ยกเลิก'),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
               ),
               TextButton(
-                child: Text('เพิ่ม'),
+                child: const Text('เพิ่ม'),
                 onPressed: () {
                   _firestore.collection('FAQ').add({
-                    'คำถาม': _questionController.text,
-                    'คำตอบ': _answerController.text,
+                    'คำถาม': questionController.text,
+                    'คำตอบ': answerController.text,
                   });
                   Navigator.of(context).pop();
                 },
@@ -88,65 +90,65 @@ class _CRUDscreenState extends State<CRUDscreen> {
       showDialog(
         context: context,
         builder: (context) {
-          final _idController = TextEditingController();
-          final _nameController = TextEditingController();
-          final _descriptionController = TextEditingController();
-          final _creditController = TextEditingController();
-          final _prerequisitesController = TextEditingController();
-          final _dayController = TextEditingController();
-          final _startTimeController = TextEditingController();
-          final _endTimeController = TextEditingController();
+          final idController = TextEditingController();
+          final nameController = TextEditingController();
+          final descriptionController = TextEditingController();
+          final creditController = TextEditingController();
+          final prerequisitesController = TextEditingController();
+          final dayController = TextEditingController();
+          final startTimeController = TextEditingController();
+          final endTimeController = TextEditingController();
 
           return AlertDialog(
-            title: Text('เพิ่มรายวิชา'),
+            title: const Text('เพิ่มรายวิชา'),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 TextField(
-                  controller: _idController,
-                  decoration: InputDecoration(
+                  controller: idController,
+                  decoration: const InputDecoration(
                     labelText: 'รหัสรายวิชา',
                   ),
                 ),
                 TextField(
-                  controller: _nameController,
-                  decoration: InputDecoration(
+                  controller: nameController,
+                  decoration: const InputDecoration(
                     labelText: 'ชื่อรายวิชา',
                   ),
                 ),
                 TextField(
-                  controller: _descriptionController,
-                  decoration: InputDecoration(
+                  controller: descriptionController,
+                  decoration: const InputDecoration(
                     labelText: 'รายละเอียดรายวิชา',
                   ),
                 ),
                 TextField(
-                  controller: _creditController,
-                  decoration: InputDecoration(
+                  controller: creditController,
+                  decoration: const InputDecoration(
                     labelText: 'หน่วยกิตรายวิชา',
                   ),
                 ),
                 TextField(
-                  controller: _prerequisitesController,
-                  decoration: InputDecoration(
+                  controller: prerequisitesController,
+                  decoration: const InputDecoration(
                     labelText: 'รายวิชาที่จำเป็นต้องเรียนก่อน',
                   ),
                 ),
                 TextField(
-                  controller: _dayController,
-                  decoration: InputDecoration(
+                  controller: dayController,
+                  decoration: const InputDecoration(
                     labelText: 'วันที่เปิดสอน',
                   ),
                 ),
                 TextField(
-                  controller: _startTimeController,
-                  decoration: InputDecoration(
+                  controller: startTimeController,
+                  decoration: const InputDecoration(
                     labelText: 'เวลาเริ่มคลาส',
                   ),
                 ),
                 TextField(
-                  controller: _endTimeController,
-                  decoration: InputDecoration(
+                  controller: endTimeController,
+                  decoration: const InputDecoration(
                     labelText: 'เวลาจบคลาส',
                   ),
                 ),
@@ -154,24 +156,24 @@ class _CRUDscreenState extends State<CRUDscreen> {
             ),
             actions: [
               TextButton(
-                child: Text('ยกเลิก'),
+                child: const Text('ยกเลิก'),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
               ),
               TextButton(
-                child: Text('เพิ่ม'),
+                child: const Text('เพิ่ม'),
                 onPressed: () {
                   _firestore.collection('Course').add({
-                    'id': _idController.text,
-                    'name': _nameController.text,
-                    'description': _descriptionController.text,
-                    'credit': _creditController.text,
-                    'prerequisites': _prerequisitesController.text,
+                    'id': idController.text,
+                    'name': nameController.text,
+                    'description': descriptionController.text,
+                    'credit': creditController.text,
+                    'prerequisites': prerequisitesController.text,
                     'schedule': {
-                      'day': _dayController.text,
-                      'startTime': _startTimeController.text,
-                      'endTime': _endTimeController.text,
+                      'day': dayController.text,
+                      'startTime': startTimeController.text,
+                      'endTime': endTimeController.text,
                     },
                   });
                   Navigator.of(context).pop();
@@ -187,26 +189,26 @@ class _CRUDscreenState extends State<CRUDscreen> {
   void _editData(String id) {
   if (_selectedData == 'FAQ') {
     _firestore.collection('FAQ').doc(id).get().then((value) {
-      final _questionController = TextEditingController(text: value['คำถาม']);
-      final _answerController = TextEditingController(text: value['คำตอบ']);
+      final questionController = TextEditingController(text: value['คำถาม']);
+      final answerController = TextEditingController(text: value['คำตอบ']);
 
       showDialog(
         context: context,
         builder: (context) {
           return AlertDialog(
-            title: Text('แก้ไขคำถาม'),
+            title: const Text('แก้ไขคำถาม'),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 TextField(
-                  controller: _questionController,
-                  decoration: InputDecoration(
+                  controller: questionController,
+                  decoration: const InputDecoration(
                     labelText: 'คำถาม',
                   ),
                 ),
                 TextField(
-                  controller: _answerController,
-                  decoration: InputDecoration(
+                  controller: answerController,
+                  decoration: const InputDecoration(
                     labelText: 'คำตอบ',
                   ),
                 ),
@@ -214,17 +216,17 @@ class _CRUDscreenState extends State<CRUDscreen> {
             ),
             actions: [
               TextButton(
-                child: Text('ยกเลิก'),
+                child: const Text('ยกเลิก'),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
               ),
               TextButton(
-                child: Text('แก้ไข'),
+                child: const Text('แก้ไข'),
                 onPressed: () {
                   _firestore.collection('FAQ').doc(id).update({
-                    'คำถาม': _questionController.text,
-                    'คำตอบ': _answerController.text,
+                    'คำถาม': questionController.text,
+                    'คำตอบ': answerController.text,
                   });
                   Navigator.of(context).pop();
                 },
@@ -236,61 +238,61 @@ class _CRUDscreenState extends State<CRUDscreen> {
     });
   } else {
     _firestore.collection('Course').doc(id).get().then((value) {
-      final _nameController = TextEditingController(text: value['name']);
-      final _descriptionController = TextEditingController(text: value['description']);
-      final _creditController = TextEditingController(text: value['credit']);
-      final _prerequisitesController = TextEditingController(text: value['prerequisites']);
-      final _dayController = TextEditingController(text: value['schedule']['day']);
-      final _startTimeController = TextEditingController(text: value['schedule']['startTime']);
-      final _endTimeController = TextEditingController(text: value['schedule']['endTime']);
+      final nameController = TextEditingController(text: value['name']);
+      final descriptionController = TextEditingController(text: value['description']);
+      final creditController = TextEditingController(text: value['credit']);
+      final prerequisitesController = TextEditingController(text: value['prerequisites']);
+      final dayController = TextEditingController(text: value['schedule']['day']);
+      final startTimeController = TextEditingController(text: value['schedule']['startTime']);
+      final endTimeController = TextEditingController(text: value['schedule']['endTime']);
 
       showDialog(
         context: context,
         builder: (context) {
           return AlertDialog(
-            title: Text('แก้ไขรายวิชา'),
+            title: const Text('แก้ไขรายวิชา'),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 TextField(
-                  controller: _nameController,
-                  decoration: InputDecoration(
+                  controller: nameController,
+                  decoration: const InputDecoration(
                     labelText: 'ชื่อรายวิชา',
                   ),
                 ),
                 TextField(
-                  controller: _descriptionController,
-                  decoration: InputDecoration(
+                  controller: descriptionController,
+                  decoration: const InputDecoration(
                     labelText: 'รายละเอียดรายวิชา',
                   ),
                 ),
                 TextField(
-                  controller: _creditController,
-                  decoration: InputDecoration(
+                  controller: creditController,
+                  decoration: const InputDecoration(
                     labelText: 'หน่วยกิตรายวิชา',
                   ),
                 ),
                 TextField(
-                  controller: _prerequisitesController,
-                  decoration: InputDecoration(
+                  controller: prerequisitesController,
+                  decoration: const InputDecoration(
                     labelText: 'รายวิชาที่จำเป็นต้องเรียนก่อน',
                   ),
                 ),
                 TextField(
-                  controller: _dayController,
-                  decoration: InputDecoration(
+                  controller: dayController,
+                  decoration: const InputDecoration(
                     labelText: 'วันที่เปิดสอน',
                   ),
                 ),
                 TextField(
-                  controller: _startTimeController,
-                  decoration: InputDecoration(
+                  controller: startTimeController,
+                  decoration: const InputDecoration(
                     labelText: 'เวลาเริ่มคลาส',
                   ),
                 ),
                 TextField(
-                  controller: _endTimeController,
-                  decoration: InputDecoration(
+                  controller: endTimeController,
+                  decoration: const InputDecoration(
                     labelText: 'เวลาจบคลาส',
                   ),
                 ),
@@ -298,23 +300,23 @@ class _CRUDscreenState extends State<CRUDscreen> {
             ),
             actions: [
               TextButton(
-                child: Text('ยกเลิก'),
+                child: const Text('ยกเลิก'),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
               ),
               TextButton(
-                child: Text('แก้ไข'),
+                child: const Text('แก้ไข'),
                 onPressed: () {
                   _firestore.collection('Course').doc(id).update({
-                    'name': _nameController.text,
-                    'description': _descriptionController.text,
-                    'credit': _creditController.text,
-                    'prerequisites': _prerequisitesController.text,
+                    'name': nameController.text,
+                    'description': descriptionController.text,
+                    'credit': creditController.text,
+                    'prerequisites': prerequisitesController.text,
                     'schedule': {
-                      'day': _dayController.text,
-                      'startTime': _startTimeController.text,
-                      'endTime': _endTimeController.text,
+                      'day': dayController.text,
+                      'startTime': startTimeController.text,
+                      'endTime': endTimeController.text,
                     },
                   });
                   Navigator.of(context).pop();
@@ -333,17 +335,17 @@ class _CRUDscreenState extends State<CRUDscreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('ลบข้อมูล'),
-          content: Text('คุณแน่ใจว่าต้องการลบข้อมูลนี้?'),
+          title: const Text('ลบข้อมูล'),
+          content: const Text('คุณแน่ใจว่าต้องการลบข้อมูลนี้?'),
           actions: [
             TextButton(
-              child: Text('ยกเลิก'),
+              child: const Text('ยกเลิก'),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             TextButton(
-              child: Text('ลบ'),
+              child: const Text('ลบ'),
               onPressed: () {
                 if (_selectedData == 'FAQ') {
                   _firestore.collection('FAQ').doc(id).delete();
@@ -363,7 +365,7 @@ class _CRUDscreenState extends State<CRUDscreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('จัดการข้อมูล'),
+        title: const Text('จัดการข้อมูล'),
       ),
       body: Column(
         children: [
@@ -376,8 +378,8 @@ class _CRUDscreenState extends State<CRUDscreen> {
             },
             items: _dataList.map((data) {
               return DropdownMenuItem(
-                child: Text(data),
                 value: data,
+                child: Text(data),
               );
             }).toList(),
           ),
@@ -397,13 +399,13 @@ class _CRUDscreenState extends State<CRUDscreen> {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               IconButton(
-                                icon: Icon(Icons.edit),
+                                icon: const Icon(Icons.edit),
                                 onPressed: () {
                                   _editData(snapshot.data!.docs[index].id);
                                 },
                               ),
                               IconButton(
-                                icon: Icon(Icons.delete),
+                                icon: const Icon(Icons.delete),
                                 onPressed: () {
                                   _deleteData(snapshot.data!.docs[index].id);
                                 },
@@ -420,13 +422,13 @@ class _CRUDscreenState extends State<CRUDscreen> {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               IconButton(
-                                icon: Icon(Icons.edit),
+                                icon: const Icon(Icons.edit),
                                 onPressed: () {
                                   _editData(snapshot.data!.docs[index].id);
                                 },
                               ),
                               IconButton(
-                                icon: Icon(Icons.delete),
+                                icon: const Icon(Icons.delete),
                                 onPressed: () {
                                   _deleteData(snapshot.data!.docs[index].id);
                                 },
@@ -438,7 +440,7 @@ class _CRUDscreenState extends State<CRUDscreen> {
                     },
                   );
                 } else {
-                  return Center(
+                  return const Center(
                     child: CircularProgressIndicator(),
                   );
                 }
@@ -452,7 +454,7 @@ class _CRUDscreenState extends State<CRUDscreen> {
           _addData();
         },
         tooltip: 'เพิ่มข้อมูล',
-        child: Icon(Icons.add),
+        child: const Icon(Icons.add),
       ),
     );
   }
@@ -469,7 +471,7 @@ class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 0;
 
   final List<Widget> _screens = [
-    Homescreen(),
+    const Homescreen(),
     CRUDscreen(),
   ];
 
@@ -484,7 +486,7 @@ class _MainScreenState extends State<MainScreen> {
             // ออกจากระบบทันที
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => Loginscreen()),
+              MaterialPageRoute(builder: (context) => const Loginscreen()),
             );
           } else {
             setState(() {
@@ -492,7 +494,7 @@ class _MainScreenState extends State<MainScreen> {
             });
           }
         },
-        items: [
+        items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
             label: 'หน้าหลัก',

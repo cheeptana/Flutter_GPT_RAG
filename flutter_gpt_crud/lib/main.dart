@@ -12,7 +12,7 @@ void main() async {
     await Firebase.initializeApp();
   } else {
     await Firebase.initializeApp(
-      options: FirebaseOptions(
+      options: const FirebaseOptions(
           apiKey: Config.apiKey,
           authDomain: Config.authDomain,
           projectId: Config.projectId,
@@ -21,7 +21,7 @@ void main() async {
           appId: Config.appId),
     );
   }
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -35,7 +35,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: Loginscreen(),
+      home: const Loginscreen(),
     );
   }
 }
