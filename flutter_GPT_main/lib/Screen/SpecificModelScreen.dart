@@ -4,13 +4,13 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_register_app/Screen/General_Modle_Screen.dart';
 import 'package:flutter_register_app/ConnectAPI/api_keys.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 
+import '../Widget_UI/CustomDrawer.dart';
 import '../Widget_UI/MassageWidget.dart';
 
 class SpecificModelScreen extends StatefulWidget {
@@ -26,42 +26,9 @@ class _SpecificModelScreenState extends State<SpecificModelScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("EducChat"),
+        backgroundColor: const Color(0xFF5c9adb),
       ),
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            const DrawerHeader(
-              decoration: BoxDecoration(
-                color: Colors.blue,
-              ),
-              child: Text(
-                'Menu',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
-                ),
-              ),
-            ),
-            ListTile(
-              title: const Text('General Modle'),
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const GeneralModleScreen()),
-                );
-              },
-            ),
-            ListTile(
-              title: const Text('Specific Modle'),
-              onTap: () {
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        ),
-      ),
+      drawer: const CustomDrawer(),
       body: const ChatWidget(apiKey: GeminiConfig.apiKey),
     );
   }
@@ -91,8 +58,9 @@ class _ChatWidgetState extends State<ChatWidget> {
   final List<({Image? image, String? text, bool fromUser})> _generatedContent =
       <({Image? image, String? text, bool fromUser})>[];
 
-  String json = '';
-  String newprompt = '';
+  String FAQjson = '';
+  String Coursejson = '';
+  String Allprompt = '';
   bool _loading = false;
 
   @override
@@ -103,22 +71,27 @@ class _ChatWidgetState extends State<ChatWidget> {
 
   Future<void> _initializeChatModel() async {
     const prompt = '''
-คุณทำหน้าที่เป็นเจ้าหน้าที่มหาวิทยาลัยราชมงคลตะวันออก วิทยาเขตจักรพงษภูวนารถ 
-มีหน้าที่สนทนาและให้ข้อมูลแก่นักศึกษา คุณจะตอบคำถามอย่างชัดเจนและตรงไปตรงมาในเรื่องที่เกี่ยวข้องกับวิทยาเขตจักรพงษภูวนารถเท่านั้น
-หากมีนักศึกษาส่งภาพให้คุณสามารถใช้ภาพเพื่อช่วยในการตอบคำถามได้ แต่ต้องเป็นภาพที่เกี่ยวข้องกับวิทยาเขตจักรพงษภูวนารถเท่านั้น
-หากนักศึกษาถามคำถามที่ไม่เกี่ยวข้องกับวิทยาเขตนี้ คุณจะชี้แจงว่าไม่สามารถให้ข้อมูลได้ เพราะคุณมีความเชี่ยวชาญเฉพาะในหัวข้อที่เกี่ยวกับวิทยาเขตจักรพงษภูวนารถโดยตรงเท่านั้น 
-ในกรณีที่พบคำถามซึ่งคุณไม่แน่ใจ หรือไม่สามารถตอบได้ คุณจะแนะนำให้นักศึกษาติดต่อศูนย์บริการทางโทรศัพท์ที่หมายเลข 02-277-2985 หรือเพจเฟซบุ๊ก 'วิทยาเขตจักรพงษภูวนารถ' เพื่อขอข้อมูลเพิ่มเติม
-นี่คือ JSON format 
+คุณจะรับบทเป็น "พี่เจ้าหน้าที่" ของมหาวิทยาลัยเทคโนโลยีราชมงคลตะวันออก วิทยาเขตจักพงษภูวนารถ 
+ทำหน้าที่ให้คำแนะนำหรือช่วยแก้ปัญหาเกี่ยวกับการลงทะเบียนเรียนของนักศึกษา คุณจะเรียกผู้ใช้ว่า "น้องนักศึกษา" หรือ "น้อง" เพื่อให้รู้สึกเป็นกันเอง 
+และตอบคำถามอย่างตรงไปตรงมา หากคำถามไม่เกี่ยวข้องกับรายวิชา การลงทะเบียนเรียนของมหาวิทยาลัยดังกล่าว 
+หรือคุณไม่สามารถตอบได้ ให้แนะนำให้นักศึกษาติดต่อฝ่ายทะเบียนที่เบอร์ 02-277-2985 หรือเพจเฟซบุ๊ก 'วิทยาเขตจักรพงษภูวนารถ' 
+นี่คือ JSON format
 ''';
-    if (json == '') {
-      json = await getFaqData();
-      newprompt = prompt + json;
-      print(newprompt);
+    if (FAQjson == '' || Coursejson == '') {
+      FAQjson = await getFaqData();
+      Coursejson = await getCourseData();
+      Allprompt = '''$prompt{
+  "FAQ": $FAQjson,
+  คุณสามารถดูข้อมูลรายวิชาได้จาก jSON formatนี้
+  "Course": $Coursejson
+}
+''';
+      print(Allprompt);
     }
     _model = GenerativeModel(
         model: 'gemini-1.5-flash-latest',
         apiKey: widget.apiKey,
-        systemInstruction: Content.system(newprompt));
+        systemInstruction: Content.system(Allprompt));
     _chat = _model.startChat();
   }
 
@@ -131,7 +104,18 @@ class _ChatWidgetState extends State<ChatWidget> {
     for (var doc in querySnapshot.docs) {
       faqList.add(doc.data() as Map<String, dynamic>);
     }
+    return jsonEncode(faqList);
+  }
 
+  Future<String> getCourseData() async {
+    FirebaseFirestore firestore = FirebaseFirestore.instance;
+    CollectionReference faqCollection = firestore.collection('Course');
+
+    QuerySnapshot querySnapshot = await faqCollection.get();
+    List<Map<String, dynamic>> faqList = [];
+    for (var doc in querySnapshot.docs) {
+      faqList.add(doc.data() as Map<String, dynamic>);
+    }
     return jsonEncode(faqList);
   }
 
@@ -182,7 +166,7 @@ class _ChatWidgetState extends State<ChatWidget> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Image.asset(
-                              'assets/Images/EducChatLogo.png',
+                              'assets/Images/logo.png',
                               width: 150,
                               height: 150,
                             ),
@@ -253,7 +237,7 @@ class _ChatWidgetState extends State<ChatWidget> {
                       }
                     },
                     icon: const Icon(Icons.keyboard_voice),
-                    color: Theme.of(context).colorScheme.primary,
+                    color: const Color(0xFF5c9adb),
                   ),
                 if (!_loading)
                   IconButton(
@@ -262,7 +246,7 @@ class _ChatWidgetState extends State<ChatWidget> {
                     },
                     icon: Icon(
                       Icons.image,
-                      color: Theme.of(context).colorScheme.primary,
+                      color: const Color(0xFF5c9adb),
                     ),
                   ),
                 if (!_loading)
@@ -272,7 +256,7 @@ class _ChatWidgetState extends State<ChatWidget> {
                     },
                     icon: Icon(
                       Icons.send,
-                      color: Theme.of(context).colorScheme.primary,
+                      color: const Color(0xFF5c9adb),
                     ),
                   )
                 else

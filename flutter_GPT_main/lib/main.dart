@@ -1,10 +1,11 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_register_app/ConnectAPI/api_keys.dart';
-import 'package:flutter_register_app/Screen/HomeScreen.dart';
 import 'package:firebase_core/firebase_core.dart';
 
-void main() async {
+import 'Screen/SpecificModelScreen.dart';
+
+void main() async { 
   WidgetsFlutterBinding.ensureInitialized();
   if (defaultTargetPlatform == TargetPlatform.android) {
     await Firebase.initializeApp();
@@ -29,7 +30,8 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: SpecificModelScreen2(),
+      home: SpecificModelScreen(),
     );
+    
   }
 }
